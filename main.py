@@ -374,4 +374,5 @@ def main():
 
 #    play(board)
 
-main()
+if __name__ == "__main__":
+    main()

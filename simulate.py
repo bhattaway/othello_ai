@@ -40,7 +40,7 @@ def prepare_next_turn(turn, white_get_move, black_get_move):
 
 def print_board(board_state):
     for row in board_state:
-        print row
+        print(row)
         
 
 def simulate_game(board_state,
@@ -59,13 +59,13 @@ def simulate_game(board_state,
                                turn=turn,
                                time_left=0,
                                opponent_time_left=0)
-        print "turn: ", turn, "next action: ", next_action
-        _ = raw_input()
+        print("turn: ", turn, "next action: ", next_action)
+        #_ = raw_input()
 
         ## CHECK FOR BLOCKED PLAYER ##
         if next_action is None:
             if player_blocked:
-                print "Both players blocked!"
+                print("Both players blocked!")
                 break
             else:
                 player_blocked = True
@@ -76,17 +76,25 @@ def simulate_game(board_state,
 
         ## APPLY ACTION ##
         ## Replace this function with your own apply function
+        '''
         board_state = main.apply_action(board_state=board_state,
                                         action=next_action,
                                         turn=turn)
+        '''
+        main.put(board=board_state,
+                    color=turn,
+                    opp_color=main.opposite_color(turn),
+                    row=next_action[0],
+                    col=next_action[1],
+                    )
         print_board(board_state)
         turn, get_move = prepare_next_turn(turn, white_get_move, black_get_move)
  
     winner, white_score, black_score = get_winner(board_state)
 
-    print "Winner: ", winner
-    print "White score: ", white_score
-    print "Black score: ", black_score
+    print("Winner: ", winner)
+    print("White score: ", white_score)
+    print("Black score: ", black_score)
     
 
 if __name__ == "__main__":
