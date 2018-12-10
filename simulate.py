@@ -100,11 +100,22 @@ def simulate_game(board_state,
 
 if __name__ == "__main__":
     ## Replace with whatever board size you want to run on
+    '''
     board_state = [[' ', ' ', ' ', ' '],
                    [' ', 'W', 'B', ' '],
                    [' ', 'B', 'W', ' '],
                    [' ', ' ', ' ', ' ']]
     board_size = 4
+    '''
+    board_state = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                   [' ', ' ', ' ', 'W', 'B', ' ', ' ', ' '],
+                   [' ', ' ', ' ', 'B', 'W', ' ', ' ', ' '],
+                   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    board_size = 8
 
     ## Give these the get_move functions from whatever ais you want to test
     white_get_move = minimax.get_move

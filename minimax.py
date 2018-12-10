@@ -1,4 +1,5 @@
 import random
+import copy
 
 BLACK = 'B'
 WHITE = 'W'
@@ -244,7 +245,6 @@ def put(board, color, opp_color, row, col):
 
 def score(board, color):
     tally = 0
-    print("IN SCORE, BOARD IS", board)
     for row in board:
         for col in row:
             if col == color:
@@ -276,7 +276,7 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
         scorelist = []
         bestmove = []
         for move in moves:
-            dummy_board = board_state
+            dummy_board = copy.deepcopy(board_state)
             put(dummy_board, turn, oppcolor, move[0], move[1])
             movescore = (move, evaluate(dummy_board, turn, oppcolor))
             scorelist.append(movescore)
