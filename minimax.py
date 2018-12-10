@@ -244,6 +244,7 @@ def put(board, color, opp_color, row, col):
 
 def score(board, color):
     tally = 0
+    print("IN SCORE, BOARD IS", board)
     for row in board:
         for col in row:
             if col == color:
@@ -273,15 +274,19 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     if len(moves) > 0:
         maxscore = -99
         scorelist = []
+        bestmove = []
         for move in moves:
             dummy_board = board_state
-            dummy_board = put(dummy_board, turn, oppcolor, move[0], move[1])
+            put(dummy_board, turn, oppcolor, move[0], move[1])
             movescore = (move, evaluate(dummy_board, turn, oppcolor))
             scorelist.append(movescore)
-            if movescore > maxscore:
-                maxscore = movescore
+            if movescore[1] > maxscore:
+                maxscore = movescore[1]
+                bestmove = move
 
         
         print(maxscore, scorelist)
+        return bestmove
+
     else:
         return None

@@ -12,6 +12,7 @@
 ## Replace these imports with the file(s) that contain your ai(s)
 import main
 import randomai
+import minimax
 #import MiniMaximus
 
 def get_winner(board_state):
@@ -106,6 +107,6 @@ if __name__ == "__main__":
     board_size = 4
 
     ## Give these the get_move functions from whatever ais you want to test
-    white_get_move = randomai.get_move
+    white_get_move = minimax.get_move
     black_get_move = randomai.get_move
     simulate_game(board_state, board_size, white_get_move, black_get_move)
