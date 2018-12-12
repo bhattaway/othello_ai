@@ -264,14 +264,62 @@ def utility(board, color, opponent_color):
         return 0
 
 def evaluate(board, color, opponent_color):
+    '''
+    #care about amount of moves
+    return len(get_valid_moves(board, color, opponent_color)) - len(get_valid_moves(board, opponent_color, color))
+    '''
+
     #care about score difference
     return score(board, color) - score(board, opponent_color)
+
+def minimax(board, color, opponent_color, depth, isMaximizing):
+    if depth == 0:
+        return evaluate(board, color, opponent_color), None
+
+    if isMaximizing:
+        bestvalue = -999
+        bestmove = None
+        movelist = get_valid_moves(board, color, opponent_color)
+        for move in movelist:
+            dummy_board = copy.deepcopy(board)
+            put(dummy_board, color, opponent_color, move[0], move[1])
+            childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, False)
+            if bestvalue < childvalue:
+                bestvalue = childvalue
+                bestmove = move
+        return bestvalue, bestmove
+    else:
+        bestvalue = 999
+        bestmove = None
+        movelist = get_valid_moves(board, opponent_color, color)
+        for move in movelist:
+            dummy_board = copy.deepcopy(board)
+            put(dummy_board, opponent_color, color, move[0], move[1])
+            childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, True)
+            if bestvalue > childvalue:
+                bestvalue = childvalue
+                bestmove = move
+        return bestvalue, bestmove
+        '''
+        value = 999
+        movelist = getmoves(board)
+        for move in movelist:
+            value = min(value, minimax(child, depth - 1, True))
+
+        return value
+        '''
+
 
 def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     arr_board_size = board_size - 1
     oppcolor = opposite_color(turn)
-    moves = get_valid_moves(board_state, turn, oppcolor)
-    if len(moves) > 0:
+    movelist = get_valid_moves(board_state, turn, oppcolor)
+    if len(movelist) > 0:
+        bestval, bestmove = minimax(board_state, turn, oppcolor, 5, True)
+        print("BESTVALUE:",bestval,"BESTMOVE",bestmove)
+
+        return bestmove
+        '''
         maxscore = -99
         scorelist = []
         bestmove = []
@@ -287,6 +335,7 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
         
         print(maxscore, scorelist)
         return bestmove
+        '''
 
     else:
         return None
