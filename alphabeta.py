@@ -274,8 +274,7 @@ def evaluate(board, color, opponent_color):
 
 def minimax(board, color, opponent_color, depth, isMaximizing):
     if depth == 0:
-        print("DEPTH 0, eval is:",evaluate(board, color, opponent_color))
-        return evaluate(board, color, opponent_color), [99,99]
+        return evaluate(board, color, opponent_color), None
 
     if isMaximizing:
         bestvalue = -999
@@ -285,11 +284,9 @@ def minimax(board, color, opponent_color, depth, isMaximizing):
             dummy_board = copy.deepcopy(board)
             put(dummy_board, color, opponent_color, move[0], move[1])
             childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, False)
-            print("IN MAX, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
-            if bestvalue <= childvalue:
+            if bestvalue < childvalue:
                 bestvalue = childvalue
                 bestmove = move
-        print("MAX: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
         return bestvalue, bestmove
     else:
         bestvalue = 999
@@ -299,11 +296,9 @@ def minimax(board, color, opponent_color, depth, isMaximizing):
             dummy_board = copy.deepcopy(board)
             put(dummy_board, opponent_color, color, move[0], move[1])
             childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, True)
-            print("IN MIN, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
-            if bestvalue >= childvalue:
+            if bestvalue > childvalue:
                 bestvalue = childvalue
                 bestmove = move
-        print("MIN: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
         return bestvalue, bestmove
         '''
         value = 999
@@ -321,7 +316,7 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     movelist = get_valid_moves(board_state, turn, oppcolor)
     if len(movelist) > 0:
         bestval, bestmove = minimax(board_state, turn, oppcolor, 3, True)
-        print("MAIN: BESTVALUE:",bestval,"BESTMOVE",bestmove)
+        print("BESTVALUE:",bestval,"BESTMOVE",bestmove)
 
         return bestmove
         '''

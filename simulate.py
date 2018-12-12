@@ -108,6 +108,7 @@ if __name__ == "__main__":
                    [' ', ' ', ' ', ' ']]
     board_size = 4
     '''
+    '''
     board_state = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -116,9 +117,20 @@ if __name__ == "__main__":
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    '''
+    board_state = [
+    [" ", " ", "B", " ", "B", "B", "B", "B"],
+    ["B", "B", "B", "B", "B", "W", "B", "B"],
+    ["B", "B", "B", "B", "B", "W", "B", " "],
+    ["B", "B", "B", "W", "W", "W", "B", "W"],
+    ["B", "B", "W", "W", "B", "B", "B", "W"],
+    ["B", " ", "W", "W", "W", "W", "B", "W"],
+    [" ", "W", "B", "W", "W", "W", "W", "W"],
+    ["W", "W", "W", "W", "W", "W", "W", "W"]
+    ]
     board_size = 8
 
     ## Give these the get_move functions from whatever ais you want to test
-    white_get_move = minimax.get_move
-    black_get_move = minimaxmobility.get_move
+    white_get_move = randomai.get_move
+    black_get_move = minimax.get_move
     simulate_game(board_state, board_size, white_get_move, black_get_move)
