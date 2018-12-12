@@ -264,13 +264,13 @@ def utility(board, color, opponent_color):
         return 0
 
 def evaluate(board, color, opponent_color):
-    '''
     #care about amount of moves
     return len(get_valid_moves(board, color, opponent_color)) - len(get_valid_moves(board, opponent_color, color))
     '''
 
     #care about score difference
     return score(board, color) - score(board, opponent_color)
+    '''
 
 def minimax(board, color, opponent_color, depth, isMaximizing):
     if depth == 0:

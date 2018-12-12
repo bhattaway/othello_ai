@@ -13,6 +13,7 @@
 import main
 import randomai
 import minimax
+import minimaxmobility
 #import MiniMaximus
 
 def get_winner(board_state):
@@ -119,5 +120,5 @@ if __name__ == "__main__":
 
     ## Give these the get_move functions from whatever ais you want to test
     white_get_move = minimax.get_move
-    black_get_move = randomai.get_move
+    black_get_move = minimaxmobility.get_move
     simulate_game(board_state, board_size, white_get_move, black_get_move)
