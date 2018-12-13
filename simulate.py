@@ -14,6 +14,10 @@ import main
 import randomai
 import minimax
 import minimaxmobility
+import corneredgemax
+import alphabeta
+import finalai
+import random
 #import MiniMaximus
 
 def get_winner(board_state):
@@ -59,8 +63,8 @@ def simulate_game(board_state,
         next_action = get_move(board_size=board_size,
                                board_state=board_state,
                                turn=turn,
-                               time_left=0,
-                               opponent_time_left=0)
+                               time_left=3000000,
+                               opponent_time_left=3000000)
         print("turn: ", turn, "next action: ", next_action)
         #_ = raw_input()
 
@@ -99,7 +103,7 @@ def simulate_game(board_state,
     print("Black score: ", black_score)
     
 
-if __name__ == "__main__":
+def bigmain():
     ## Replace with whatever board size you want to run on
     '''
     board_state = [[' ', ' ', ' ', ' '],
@@ -118,6 +122,7 @@ if __name__ == "__main__":
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
                    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
     '''
+    '''
     board_state = [
     [" ", " ", "B", " ", "B", "B", "B", "B"],
     ["B", "B", "B", "B", "B", "W", "B", "B"],
@@ -128,9 +133,25 @@ if __name__ == "__main__":
     [" ", "W", "B", "W", "W", "W", "W", "W"],
     ["W", "W", "W", "W", "W", "W", "W", "W"]
     ]
+    '''
+    board_state = [
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", "W"],
+    [" ", " ", " ", " ", " ", " ", "W", " "],
+    [" ", " ", " ", "W", "W", "W", " ", " "],
+    [" ", " ", " ", "W", "W", " ", " ", " "],
+    [" ", "B", "B", "B", "B", "W", " ", " "],
+    [" ", " ", " ", " ", "B", "W", "W", " "],
+    [" ", " ", " ", " ", "B", "W", "B", " "]
+    ]
     board_size = 8
 
     ## Give these the get_move functions from whatever ais you want to test
-    white_get_move = randomai.get_move
-    black_get_move = minimax.get_move
+    white_get_move = finalai.get_move
+    #black_get_move = corneredgemax.get_move
+    black_get_move = randomai.get_move
     simulate_game(board_state, board_size, white_get_move, black_get_move)
+
+for i in range(1):
+    #random.seed(5)
+    bigmain()

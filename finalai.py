@@ -372,26 +372,99 @@ def utility(board, color, opponent_color):
     else:
         return 0
 
+def corner_test(board, color):
+    total = 0
+
+    if board[0][0] == color:
+        total += 1
+    if board[-1][0] == color:
+        total += 1
+    if board[0][-1] == color:
+        total += 1
+    if board[-1][-1] == color:
+        total += 1
+
+    if board[0][0] == SPACE:
+        if board[1][1] == color:
+            total -= 2
+        if board[1][0] == color:
+            total -= 2
+        if board[0][1] == color:
+            total -= 2
+    if board[-1][0] == SPACE:
+        if board[-2][1] == color:
+            total -= 2
+        if board[-1][1] == color:
+            total -= 2
+        if board[-2][0] == color:
+            total -= 2
+    if board[0][-1] == SPACE:
+        if board[1][-2] == color:
+            total -= 2
+        if board[1][-1] == color:
+            total -= 2
+        if board[0][-2] == color:
+            total -= 2
+    if board[-1][-1] == SPACE:
+        if board[-2][-1] == color:
+            total -= 2
+        if board[-1][-2] == color:
+            total -= 2
+        if board[-2][-2] == color:
+            total -= 2
+
+    return total
+
+
+
 def evaluate(board, color, opponent_color):
     '''
     #care about amount of moves
     return len(get_valid_moves(board, color, opponent_color)) - len(get_valid_moves(board, opponent_color, color))
     '''
     board_size = len(board)
-    #some spaces were found...
-    if get_num_turns(board) < board_size * board_size - 10:
-        #mobility
-        #print("DOING MOBILITY")
-        return num_frontier_discs(board, opponent_color) - num_frontier_discs(board, color)
+
     #no more turns left, do a true eval
-    elif get_num_turns(board) - board_size * board_size == 0:
+    if get_num_turns(board) - board_size * board_size == 0:
         # no spaces were found: care only about final outcome
         # (technically need to care about len of each player's moves being zero, but w/e)
-        return utility(board, color, opponent_color)
+        score_weight = 100
+        score_value = score_weight * (flat_score(board, color) - flat_score(board, opponent_color)) / \
+                        (flat_score(board, color) + flat_score(board, opponent_color))
+
+        #print("SCORE ONLY:",score_value)
+        return score_value
     else:
+        #if get_num_turns(board) < board_size * board_size - 10:
+        #mobility
+        score_weight = 25
+        score_value = score_weight * (flat_score(board, color) - flat_score(board, opponent_color)) / \
+                        (flat_score(board, color) + flat_score(board, opponent_color))
+
+        corner_denom = corner_test(board, color) + corner_test(board, opponent_color)
+        if corner_denom != 0:
+            corner_weight = 300
+            corner_value = corner_weight * (corner_test(board, color) - corner_test(board, opponent_color)) / \
+                            corner_denom
+        else:
+            corner_value = 0
+
+
+        frontier_denom = num_frontier_discs(board, color) + num_frontier_discs(board, opponent_color)
+        if frontier_denom != 0:
+            frontier_weight = 35
+            frontier_value = frontier_weight * (num_frontier_discs(board, color) - num_frontier_discs(board, opponent_color)) / \
+                                frontier_denom
+        else:
+            frontier_value = 0
+
+
+        #print("SCORE:",score_value,"CORNER:",corner_value,"FRONTIER:",frontier_value,"TOTAL:",score_value + corner_value + frontier_value)
+        return score_value + corner_value + frontier_value
+        #return num_frontier_discs(board, opponent_color) - num_frontier_discs(board, color)
         #care about score difference
         #print("DOING SCORE")
-        return score(board, color) - score(board, opponent_color)
+        #score_value = score_weight * score(board, color) - score(board, opponent_color)
 
 def alphabeta(board, color, opponent_color, depth, alpha, beta, isMaximizing):
     if depth == 0:
@@ -464,18 +537,19 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     arr_board_size = board_size - 1
     oppcolor = opposite_color(turn)
     movelist = get_valid_moves(board_state, turn, oppcolor)
-    print("TURN", get_num_turns(board_state))
+    #input()
+    #print("TURN", get_num_turns(board_state))
     if len(movelist) > 0:
         if time_left < 5000:
-            bestval, bestmove = alphabeta(board_state, turn, oppcolor, 3, -9999, 9999, True)
+            bestval, bestmove = alphabeta(board_state, turn, oppcolor, 4, -9999, 9999, True)
             pass
         elif time_left < 500:
             bestval = "RANDOM"
             bestmove = random.choice(movelist)
             pass
         else:
-            bestval, bestmove = alphabeta(board_state, turn, oppcolor, 6, -9999, 9999, True)
-        print("MAIN: BESTVALUE:",bestval,"BESTMOVE",bestmove)
+            bestval, bestmove = alphabeta(board_state, turn, oppcolor, 4, -9999, 9999, True)
+        #print("MAIN: BESTVALUE:",bestval,"BESTMOVE",bestmove)
 
         return bestmove
 

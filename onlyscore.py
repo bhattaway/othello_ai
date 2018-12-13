@@ -6,6 +6,58 @@ WHITE = 'W'
 SPACE = ' '
 
 
+def get_num_turns(board):
+    num_turns = 0
+    for row in board:
+        for char in row:
+            if char != SPACE:
+                num_turns += 1
+
+    return num_turns
+
+def num_frontier_discs(board, color):
+    num_discs = 0
+    board_size = len(board)
+    for i in range(board_size):
+        for j in range(board_size):
+            #print("checking ij...", end='')
+            if board[i][j] == color:
+                #print("COLOR FOUND!",i,j, end='')
+                #the middle
+                if i > 0 and j > 0 and i < board_size - 1 and j < board_size - 1:
+                    #print("MIDDLE FOUND",i,j)
+                    #n w s e se ne sw nw
+                    if board[i-1][j] == SPACE or \
+                        board[i][j-1] == SPACE or \
+                        board[i+1][j] == SPACE or \
+                        board[i][j+1] == SPACE or \
+                        board[i+1][j+1] == SPACE or \
+                        board[i-1][j+1] == SPACE or \
+                        board[i+1][j-1] == SPACE or \
+                        board[i-1][j-1] == SPACE:
+                        num_discs += 1
+
+                #top/bot rows
+                elif i == 0 or i == board_size - 1:
+                    if j != 0 and j != board_size - 1:
+                        #print("TOPBOT FOUND",i,j)
+                        # w e
+                        if board[i][j-1] == SPACE or \
+                            board[i][j+1] == SPACE:
+                            num_discs += 1
+                    else:
+                        #print("CORNER FOUND",i,j)
+                        num_discs -= 20
+
+                #left/right cols
+                elif j == 0 or j == board_size - 1:
+                    #print("LR FOUND",i,j)
+                    if i != 0 and i != board_size - 1:
+                        # n s
+                        if board[i-1][j] == SPACE or \
+                            board[i+1][j] == SPACE: \
+                            num_discs += 1
+    return num_discs
 
 def opposite_color(color):
     if color == BLACK:
@@ -243,23 +295,80 @@ def put(board, color, opp_color, row, col):
         return False
 
 
+def flat_score(board, color):
+    tally = 0
+    board_size = len(board)
+    for i in range(board_size):
+        for j in range(board_size):
+            #print("IJ:",i,j, end=' ')
+            if board[i][j] == color:
+                tally += 1
+    #print("IN FLAT SCORE FOR",color,tally)
+    return tally
+
 def score(board, color):
     tally = 0
-    for row in board:
-        for col in row:
-            if col == color:
-                tally += 1
+    board_size = len(board) - 1
+    scores = [[5, 3, 3, 3, 3, 3, 3, 5],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [5, 3, 3, 3, 3, 3, 3, 5]]
+    '''
+    scores = [[40, 3, 3, 3, 3, 3, 3, 40],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [40, 3, 3, 3, 3, 3, 3, 40]]
+    '''
+    '''
+    scores = [[80, -5, 3, 3, 3, 3, -5, 80],
+                   [-5, -7, 1, 1, 1, 1, -7, -5],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [3, 1, 1, 1, 1, 1, 1, 3],
+                   [-5, -7, 1, 1, 1, 1, -7, -5],
+                   [80, -5, 3, 3, 3, 3, -5, 80]]
+    if board[0][0] != SPACE:
+        scores[1][1] = 1
+        scores[0][1] = 3
+        scores[1][0] = 3
+    if board[-1][0] != SPACE:
+        scores[-2][1] = 1
+        scores[-1][1] = 3
+        scores[-2][0] = 3
+    if board[0][-1] != SPACE:
+        scores[1][-2] = 1
+        scores[1][-1] = 3
+        scores[0][-2] = 3
+    if board[-1][-1] != SPACE:
+        scores[-2][-2] = 1
+        scores[-1][-2] = 3
+        scores[-2][-1] = 3
+    '''
+    for i in range(board_size + 1):
+        for j in range(board_size + 1):
+            if board[i][j] == color:
+                #print("SCORING:",i,j,scores[i][j])
+                tally += scores[i][j]
     return tally
 
 def utility(board, color, opponent_color):
-    myscore = score(board, color)
-    oppscore = score(board, opponent_color)
+    myscore = flat_score(board, color)
+    oppscore = flat_score(board, opponent_color)
 
     #only care about win loss
     if myscore < oppscore:
-        return -1
+        return -998
     elif myscore > oppscore:
-        return 1
+        return 998
     else:
         return 0
 
@@ -268,79 +377,103 @@ def evaluate(board, color, opponent_color):
     #care about amount of moves
     return len(get_valid_moves(board, color, opponent_color)) - len(get_valid_moves(board, opponent_color, color))
     '''
+    board_size = len(board)
+    #some spaces were found...
+    #no more turns left, do a true eval
+    if get_num_turns(board) - board_size * board_size == 0:
+        # no spaces were found: care only about final outcome
+        # (technically need to care about len of each player's moves being zero, but w/e)
+        return utility(board, color, opponent_color)
+    else:
+        #care about score difference
+        #print("DOING SCORE")
+        return score(board, color) - score(board, opponent_color)
 
-    #care about score difference
-    return score(board, color) - score(board, opponent_color)
-
-def minimax(board, color, opponent_color, depth, isMaximizing):
+def alphabeta(board, color, opponent_color, depth, alpha, beta, isMaximizing):
     if depth == 0:
         #print("DEPTH 0, eval is:",evaluate(board, color, opponent_color))
+        #if isMaximizing:
         return evaluate(board, color, opponent_color), [99,99]
+        '''
+        else:
+            return evaluate(board, opponent_color, color), [99,99]
+        '''
 
     if isMaximizing:
         bestvalue = -999
         bestmove = None
         movelist = get_valid_moves(board, color, opponent_color)
+        if len(movelist) < 1:
+            bestvalue = evaluate(board, color, opponent_color)
         for move in movelist:
+            '''
+            board_size = len(board) - 1
+            if move in ([0,0],[0,board_size],[board_size,0],[board_size,board_size]):
+                print("CORNER MOVE MAX FOUND GIMME GIMME",move)
+                return 500, move
+            '''
             dummy_board = copy.deepcopy(board)
             put(dummy_board, color, opponent_color, move[0], move[1])
-            childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, False)
-            print("IN MAX, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
+            childvalue, childmove = alphabeta(dummy_board, color, opponent_color, depth - 1, alpha, beta, False)
+            #print("IN MAX, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
             if bestvalue <= childvalue:
                 bestvalue = childvalue
                 bestmove = move
-        print("MAX: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
+            alpha = max(alpha, bestvalue)
+            if alpha >= beta:
+                #print("BETA CUTOFF REACHED a:",alpha,"b:",beta)
+                break
+
+        #print("MAX: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
         return bestvalue, bestmove
     else:
         bestvalue = 999
         bestmove = None
         movelist = get_valid_moves(board, opponent_color, color)
+        #print(movelist)
+        if len(movelist) < 1:
+            bestvalue = evaluate(board, color, opponent_color)
         for move in movelist:
+            '''
+            board_size = len(board) - 1
+            print("MOVE IS:",move)
+            if move in ([0,0],[0,board_size],[board_size,0],[7,7]):
+                print("CORNER MOVE MIN FOUND GIMME GIMME",move)
+                return -500, move
+            '''
             dummy_board = copy.deepcopy(board)
             put(dummy_board, opponent_color, color, move[0], move[1])
-            childvalue, childmove = minimax(dummy_board, color, opponent_color, depth - 1, True)
-            print("IN MIN, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
+            childvalue, childmove = alphabeta(dummy_board, color, opponent_color, depth - 1, alpha, beta, True)
+            #print("IN MIN, INVESTIGATING MOVE", move, "AT DEPTH",depth,"VALUE",childvalue)
             if bestvalue >= childvalue:
                 bestvalue = childvalue
                 bestmove = move
-        print("MIN: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
+            beta = min(beta, bestvalue)
+            if alpha >= beta:
+                #print("ALPHA CUTOFF REACHED a:",alpha,"b:",beta)
+                break
+        #print("MIN: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
         return bestvalue, bestmove
-        '''
-        value = 999
-        movelist = getmoves(board)
-        for move in movelist:
-            value = min(value, minimax(child, depth - 1, True))
-
-        return value
-        '''
 
 
 def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     arr_board_size = board_size - 1
     oppcolor = opposite_color(turn)
     movelist = get_valid_moves(board_state, turn, oppcolor)
+    print("TURN", get_num_turns(board_state))
     if len(movelist) > 0:
-        bestval, bestmove = minimax(board_state, turn, oppcolor, 3, True)
+        if time_left < 5000:
+            #bestval, bestmove = alphabeta(board_state, turn, oppcolor, 3, -9999, 9999, True)
+            pass
+        elif time_left < 500:
+            #bestval = "RANDOM"
+            #bestmove = random.choice(movelist)
+            pass
+        else:
+            bestval, bestmove = alphabeta(board_state, turn, oppcolor, 7, -9999, 9999, True)
         print("MAIN: BESTVALUE:",bestval,"BESTMOVE",bestmove)
 
         return bestmove
-        '''
-        maxscore = -99
-        scorelist = []
-        bestmove = []
-        for move in moves:
-            dummy_board = copy.deepcopy(board_state)
-            put(dummy_board, turn, oppcolor, move[0], move[1])
-            movescore = (move, evaluate(dummy_board, turn, oppcolor))
-            scorelist.append(movescore)
-            if movescore[1] > maxscore:
-                maxscore = movescore[1]
-                bestmove = move
-
-        
-        print(maxscore, scorelist)
-        return bestmove
-        '''
 
     else:
         return None

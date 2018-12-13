@@ -243,23 +243,45 @@ def put(board, color, opp_color, row, col):
         return False
 
 
+def flat_score(board, color):
+    tally = 0
+    board_size = len(board)
+    for i in range(board_size):
+        for j in range(board_size):
+            print("IJ:",i,j, end=' ')
+            if board[i][j] == color:
+                tally += 1
+    print("IN FLAT SCORE FOR",color,tally)
+    return tally
+
 def score(board, color):
     tally = 0
-    for row in board:
-        for col in row:
-            if col == color:
+    board_size = len(board)
+    for i in range(board_size):
+        for j in range(board_size):
+            if board[i][j] == color:
+                if (i == 0 and j == 0) or \
+                        (i == board_size - 1 and j == 0) or \
+                        (i == 0 and j == board_size - 1) or \
+                        (i == board_size - 1 and j == board_size - 1):
+                    tally += 99
+                    print("CORNER!!",i,j)
+
+                elif i == 0 or j == 0 or i == board_size - 1 or j == board_size - 1:
+                    tally += 2
+
                 tally += 1
     return tally
 
 def utility(board, color, opponent_color):
-    myscore = score(board, color)
-    oppscore = score(board, opponent_color)
+    myscore = flat_score(board, color)
+    oppscore = flat_score(board, opponent_color)
 
     #only care about win loss
     if myscore < oppscore:
-        return -1
+        return -998
     elif myscore > oppscore:
-        return 1
+        return 998
     else:
         return 0
 
@@ -269,6 +291,20 @@ def evaluate(board, color, opponent_color):
     return len(get_valid_moves(board, color, opponent_color)) - len(get_valid_moves(board, opponent_color, color))
     '''
 
+    get_out = False
+    for row in board:
+        for char in row:
+            if char == SPACE:
+                get_out = True
+                break
+        if get_out:
+            break
+    else:
+        # no spaces were found: care only about final outcome
+        # (technically need to care about len of each player's moves being zero, but w/e)
+        return utility(board, color, opponent_color)
+
+    #some spaces were found...
     #care about score difference
     return score(board, color) - score(board, opponent_color)
 
@@ -281,6 +317,8 @@ def minimax(board, color, opponent_color, depth, isMaximizing):
         bestvalue = -999
         bestmove = None
         movelist = get_valid_moves(board, color, opponent_color)
+        if len(movelist) < 1:
+            bestvalue = evaluate(board, color, opponent_color)
         for move in movelist:
             dummy_board = copy.deepcopy(board)
             put(dummy_board, color, opponent_color, move[0], move[1])
@@ -295,6 +333,8 @@ def minimax(board, color, opponent_color, depth, isMaximizing):
         bestvalue = 999
         bestmove = None
         movelist = get_valid_moves(board, opponent_color, color)
+        if len(movelist) < 1:
+            bestvalue = evaluate(board, color, opponent_color)
         for move in movelist:
             dummy_board = copy.deepcopy(board)
             put(dummy_board, opponent_color, color, move[0], move[1])
@@ -305,14 +345,6 @@ def minimax(board, color, opponent_color, depth, isMaximizing):
                 bestmove = move
         print("MIN: DEPTH",depth,"; BESTVALUE",bestvalue,"; BESTMOVE",bestmove)
         return bestvalue, bestmove
-        '''
-        value = 999
-        movelist = getmoves(board)
-        for move in movelist:
-            value = min(value, minimax(child, depth - 1, True))
-
-        return value
-        '''
 
 
 def get_move(board_size, board_state, turn, time_left, opponent_time_left):
@@ -320,27 +352,16 @@ def get_move(board_size, board_state, turn, time_left, opponent_time_left):
     oppcolor = opposite_color(turn)
     movelist = get_valid_moves(board_state, turn, oppcolor)
     if len(movelist) > 0:
-        bestval, bestmove = minimax(board_state, turn, oppcolor, 3, True)
+        if time_left < 5000:
+            bestval, bestmove = minimax(board_state, turn, oppcolor, 3, True)
+        elif time_left < 500:
+            bestval = "RANDOM"
+            bestmove = random.choice(movelist)
+        else:
+            bestval, bestmove = minimax(board_state, turn, oppcolor, 5, True)
         print("MAIN: BESTVALUE:",bestval,"BESTMOVE",bestmove)
 
         return bestmove
-        '''
-        maxscore = -99
-        scorelist = []
-        bestmove = []
-        for move in moves:
-            dummy_board = copy.deepcopy(board_state)
-            put(dummy_board, turn, oppcolor, move[0], move[1])
-            movescore = (move, evaluate(dummy_board, turn, oppcolor))
-            scorelist.append(movescore)
-            if movescore[1] > maxscore:
-                maxscore = movescore[1]
-                bestmove = move
-
-        
-        print(maxscore, scorelist)
-        return bestmove
-        '''
 
     else:
         return None
